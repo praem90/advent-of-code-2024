@@ -15,42 +15,19 @@ fn main() {
         }
         println!("The report {}", l);
         let levels: Vec<i32> = l.split_whitespace().map(|s| s.parse::<i32>().unwrap()).collect();
-        let mut prev = None;
-        let mut is_asc = None;
 
-        let mut valid = true;
+        let mut valid = is_safe(&levels);
 
-        for l in levels {
-            println!("The level {}", l);
-            if let Some(p) = prev {
-                let diff: i32 = l - p;
-                println!("l={}, p={}, diff={}", l, p, diff);
-                if let None = is_asc {
-                    is_asc = Some(diff > 0)
-                }
+        if !valid {
+            for i in 0..levels.len() {
+                let mut subset = levels.clone();
+                subset.remove(i);
+                valid = is_safe(&subset);
 
-                if diff == 0 {
-                    valid = false;
+                if valid {
                     break;
                 }
-
-                if is_asc.unwrap() && diff < 0 {
-                    valid = false;
-                    break;
-                }
-
-                if !is_asc.unwrap() && diff > 0 {
-                    valid = false;
-                    break;
-                }
-
-                if diff.abs() > 3 {
-                    valid = false;
-                    break;
-                }
-
             }
-            prev = Some(l);
         }
 
         if valid {
@@ -63,3 +40,45 @@ fn main() {
 
     println!("The no of safe reports {}", safe_reports);
 }
+
+fn is_safe(levels: &Vec<i32>) -> bool {
+    let mut valid = true;
+    let mut prev = None;
+    let mut is_asc = None;
+
+    for l in levels {
+        println!("The level {}", l);
+        if let Some(p) = prev {
+            let diff: i32 = l - p;
+            println!("l={}, p={}, diff={}", l, p, diff);
+            if let None = is_asc {
+                is_asc = Some(diff > 0)
+            }
+
+            if diff == 0 {
+                valid = false;
+                break;
+            }
+
+            if is_asc.unwrap() && diff < 0 {
+                valid = false;
+                break;
+            }
+
+            if !is_asc.unwrap() && diff > 0 {
+                valid = false;
+                break;
+            }
+
+            if diff.abs() > 3 {
+                valid = false;
+                break;
+            }
+
+        }
+        prev = Some(l);
+    }
+
+    valid
+}
+
